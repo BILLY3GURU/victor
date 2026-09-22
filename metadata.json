@@ -1,0 +1,6 @@
+{
+  "name": "Vick Photography",
+  "description": "Professional photography portfolio and session booking for Vick Photography in Kenya.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
