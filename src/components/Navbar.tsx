@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import logoImg from '../assets/logo.jpg';
 
@@ -59,7 +59,7 @@ export default function Navbar() {
         </motion.a>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-7">
           {navLinks.map((link, i) => (
             <motion.a
               key={link.name}
@@ -75,19 +75,38 @@ export default function Navbar() {
           ))}
           <a 
             href="#book" 
-            className="px-6 py-2 border border-red-600 text-red-600 text-[10px] uppercase tracking-[0.2em] font-bold rounded-full hover:bg-red-600 hover:text-white transition-all duration-300"
+            className="px-5 py-2 border border-red-600 text-red-600 text-[10px] uppercase tracking-[0.2em] font-bold rounded-full hover:bg-red-600 hover:text-white transition-all duration-300"
           >
             Book Now
           </a>
+          <a 
+            href="/admin" 
+            title="Open Client Admin Portal"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-red-600/40 bg-zinc-900/90 text-zinc-200 text-[10px] uppercase tracking-[0.2em] font-bold hover:border-red-500 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-md group cursor-pointer"
+          >
+            <Lock className="w-3.5 h-3.5 text-red-500 group-hover:text-white transition-colors" />
+            <span>Admin</span>
+          </a>
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden text-white hover:text-red-600 transition-colors"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </button>
+        {/* Mobile Toggle & Direct Admin Quick Access */}
+        <div className="flex md:hidden items-center gap-3">
+          <a
+            href="/admin"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-red-600/40 bg-zinc-900/90 text-zinc-200 text-[10px] uppercase tracking-wider font-bold hover:border-red-500 hover:text-white"
+            title="Client Admin Portal"
+          >
+            <Lock className="w-3 h-3 text-red-500" />
+            <span>Admin</span>
+          </a>
+          <button
+            className="text-white hover:text-red-600 transition-colors p-1"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -110,6 +129,16 @@ export default function Navbar() {
                   {link.name}
                 </a>
               ))}
+              <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
+                <a
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-red-600/50 bg-red-950/30 text-white font-serif tracking-widest text-sm hover:bg-red-600 transition-all font-semibold"
+                >
+                  <Lock className="w-4 h-4 text-red-500" />
+                  <span>CLIENT ADMIN PORTAL</span>
+                </a>
+              </div>
             </div>
           </motion.div>
         )}

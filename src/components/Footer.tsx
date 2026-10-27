@@ -1,4 +1,4 @@
-import { Instagram, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Mail, Phone, MapPin, Lock } from 'lucide-react';
 import logoImg from '../assets/logo.jpg';
 
 export default function Footer() {
@@ -112,11 +112,15 @@ export default function Footer() {
           <p className="text-zinc-600 text-[10px] uppercase tracking-widest">
             © {new Date().getFullYear()} Vick Photography. All Rights Reserved.
           </p>
-          <div className="flex gap-6 items-center">
+          <div className="flex flex-wrap gap-4 items-center">
             <a href="#" className="text-zinc-600 text-[10px] uppercase tracking-widest hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="text-zinc-600 text-[10px] uppercase tracking-widest hover:text-white transition-colors">Terms of Service</a>
-            <a href="/admin" className="text-zinc-600 text-[10px] uppercase tracking-widest hover:text-red-500 transition-colors flex items-center gap-1">
-              <span>Client Admin</span>
+            <a 
+              href="/admin" 
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-red-600/40 bg-zinc-900/90 text-zinc-300 text-[10px] uppercase tracking-widest hover:border-red-500 hover:text-white hover:bg-red-950/40 transition-all font-semibold"
+            >
+              <Lock className="w-3 h-3 text-red-500" />
+              <span>Client Admin Portal</span>
             </a>
           </div>
         </div>
