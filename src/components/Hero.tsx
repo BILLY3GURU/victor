@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 
-export default function Hero() {
+export default function Hero({ heroImage }: { heroImage?: string }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -10,6 +10,7 @@ export default function Hero() {
   });
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const displayImage = heroImage || "https://res.cloudinary.com/dpskjlq9m/image/upload/q_auto,f_auto,w_1920/v1790012739/DSC_8623.JPG_jyeuwq.jpg";
 
   return (
     <section ref={ref} className="relative h-screen w-full overflow-hidden flex items-center justify-center">
@@ -19,7 +20,7 @@ export default function Hero() {
         className="absolute inset-0 z-0"
       >
         <img
-          src="https://res.cloudinary.com/dpskjlq9m/image/upload/q_auto,f_auto,w_1920/v1790012739/DSC_8623.JPG_jyeuwq.jpg"
+          src={displayImage}
           alt="Vick Photography Hero"
           className="w-full h-full object-cover scale-110"
           referrerPolicy="no-referrer"

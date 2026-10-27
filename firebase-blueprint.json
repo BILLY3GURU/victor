@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "galleryItem": {
+      "title": "Gallery Item",
+      "description": "A photograph in the portfolio archives",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title or caption of the photograph"
+        },
+        "category": {
+          "type": "string",
+          "description": "Portfolio folder or category"
+        },
+        "url": {
+          "type": "string",
+          "description": "High resolution image URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display sequence ordering index"
+        }
+      },
+      "required": ["title", "category", "url", "createdAt"]
+    },
+    "siteConfig": {
+      "title": "Site Configuration",
+      "description": "Global website custom images and settings",
+      "type": "object",
+      "properties": {
+        "heroImage": {
+          "type": "string",
+          "description": "Homepage hero image URL"
+        },
+        "aboutImage": {
+          "type": "string",
+          "description": "About / Storyteller image URL"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/gallery/{imageId}": {
+      "schema": "galleryItem",
+      "description": "Public portfolio images managed by admin"
+    },
+    "/config/{configId}": {
+      "schema": "siteConfig",
+      "description": "Website custom display settings"
+    }
+  }
+}

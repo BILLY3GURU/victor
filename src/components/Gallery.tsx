@@ -265,7 +265,7 @@ const FolderScrollRow: FC<FolderScrollRowProps> = ({ folder, images, onOpenLight
   );
 };
 
-export default function Gallery() {
+export default function Gallery({ galleryImages }: { galleryImages?: GalleryImage[] }) {
   const [activeFolderId, setActiveFolderId] = useState<string>('all');
   const [lightboxData, setLightboxData] = useState<{
     image: GalleryImage;
@@ -273,9 +273,29 @@ export default function Gallery() {
     index: number;
   } | null>(null);
 
+  const images = galleryImages && galleryImages.length > 0 ? galleryImages : GALLERY_IMAGES;
+
+  // Build folder definitions, auto-discovering any newly created folders from database
+  const knownCategories = new Set(FOLDERS.map(f => f.category.toLowerCase()));
+  const extraFolders: FolderDefinition[] = [];
+  images.forEach(img => {
+    if (!knownCategories.has(img.category.toLowerCase())) {
+      knownCategories.add(img.category.toLowerCase());
+      extraFolders.push({
+        id: img.category.toLowerCase().replace(/\s+/g, '-'),
+        name: `${img.category} Collection`,
+        category: img.category,
+        badge: `Folder 0${FOLDERS.length + extraFolders.length + 1}`,
+        tagline: `${img.category} Showcase`,
+        description: `Curated ${img.category.toLowerCase()} photography series.`
+      });
+    }
+  });
+
+  const allFolders = [...FOLDERS, ...extraFolders];
   const displayedFolders = activeFolderId === 'all'
-    ? FOLDERS
-    : FOLDERS.filter(f => f.id === activeFolderId);
+    ? allFolders
+    : allFolders.filter(f => f.id === activeFolderId);
 
   const handleOpenLightbox = (image: GalleryImage, images: GalleryImage[], index: number) => {
     setLightboxData({ image, images, index });
@@ -345,11 +365,11 @@ export default function Gallery() {
               )}
             >
               <FolderOpen className="w-3.5 h-3.5" />
-              <span>All Folders ({GALLERY_IMAGES.length})</span>
+              <span>All Folders ({images.length})</span>
             </button>
 
-            {FOLDERS.map((folder) => {
-              const count = GALLERY_IMAGES.filter(img => img.category === folder.category).length;
+            {allFolders.map((folder) => {
+              const count = images.filter(img => img.category.toLowerCase() === folder.category.toLowerCase()).length;
               const isActive = activeFolderId === folder.id;
               return (
                 <button
@@ -381,8 +401,8 @@ export default function Gallery() {
               transition={{ duration: 0.3 }}
             >
               {displayedFolders.map((folder) => {
-                const folderImages = GALLERY_IMAGES.filter(
-                  img => img.category === folder.category
+                const folderImages = images.filter(
+                  img => img.category.toLowerCase() === folder.category.toLowerCase()
                 );
                 return (
                   <FolderScrollRow

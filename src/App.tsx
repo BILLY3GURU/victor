@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Gallery from './components/Gallery';
@@ -9,9 +10,23 @@ import BookingForm from './components/BookingForm';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import FloatingContact from './components/WhatsAppButton';
+import AdminPortal from './components/admin/AdminPortal';
+import { AuthProvider } from './context/AuthContext';
+import {
+  subscribeToGallery,
+  subscribeToSiteConfig,
+  DEFAULT_SITE_CONFIG
+} from './lib/galleryService';
+import { GalleryImage, SiteConfig } from './types';
 import { motion, useScroll, useSpring } from 'motion/react';
 
-export default function App() {
+function MainPortfolio({
+  galleryImages,
+  siteConfig
+}: {
+  galleryImages: GalleryImage[];
+  siteConfig: SiteConfig;
+}) {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -32,7 +47,7 @@ export default function App() {
       <Navbar />
       
       <main>
-        <Hero />
+        <Hero heroImage={siteConfig.heroImage} />
         
         {/* Stats Section - Refined */}
         <section className="py-24 px-6 bg-black relative overflow-hidden">
@@ -74,7 +89,7 @@ export default function App() {
             >
               <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://res.cloudinary.com/dpskjlq9m/image/upload/q_auto,f_auto,w_1200/v1790012649/NNP_6167rrrrrr.jpg_oouwdh.jpg"
+                  src={siteConfig.aboutImage}
                   alt="Vick Photographer"
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 transform hover:scale-105"
                   referrerPolicy="no-referrer"
@@ -92,10 +107,11 @@ export default function App() {
               <span className="text-red-600 uppercase tracking-[0.4em] text-[10px] font-bold mb-4 block">The Storyteller</span>
               <h2 className="text-5xl md:text-7xl font-serif mb-8 leading-tight tracking-tight">
                 Crafting <br />
-                <span className="italic text-red-600">Timeless Memories</span>
+                <span className="italic text-red-600">{siteConfig.aboutTitle || 'Timeless Memories'}</span>
               </h2>
               <p className="text-zinc-400 text-lg font-light leading-relaxed mb-8">
-                Based in the heart of Kenya, I believe every frame should tell a story that resonates across generations. My approach combines technical precision with a deep understanding of human connection, ensuring that your most precious moments are preserved with the elegance they deserve.
+                {siteConfig.aboutBio ||
+                  'Based in the heart of Kenya, I believe every frame should tell a story that resonates across generations. My approach combines technical precision with a deep understanding of human connection, ensuring that your most precious moments are preserved with the elegance they deserve.'}
               </p>
               <div className="grid grid-cols-2 gap-8 mb-12">
                 <div>
@@ -117,7 +133,7 @@ export default function App() {
           </div>
         </section>
 
-        <Gallery />
+        <Gallery galleryImages={galleryImages} />
         <VideoShowcase />
         <Process />
         <Services />
@@ -127,5 +143,80 @@ export default function App() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  const [isAdminView, setIsAdminView] = useState(() => {
+    return (
+      window.location.pathname.startsWith('/admin') ||
+      window.location.hash === '#admin'
+    );
+  });
+
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setIsAdminView(
+        window.location.pathname.startsWith('/admin') ||
+        window.location.hash === '#admin'
+      );
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+
+    // Global intercept for links pointing to /admin
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest('a');
+      if (target && target.getAttribute('href') === '/admin') {
+        e.preventDefault();
+        window.history.pushState({}, '', '/admin');
+        setIsAdminView(true);
+      }
+    };
+    document.addEventListener('click', handleGlobalClick);
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
+
+  // Subscribe to real-time updates from Firestore
+  useEffect(() => {
+    const unsubGallery = subscribeToGallery((data) => {
+      setGalleryImages(data);
+    });
+
+    const unsubConfig = subscribeToSiteConfig((cfg) => {
+      setSiteConfig(cfg);
+    });
+
+    return () => {
+      unsubGallery();
+      unsubConfig();
+    };
+  }, []);
+
+  const handleGoHome = () => {
+    window.history.pushState({}, '', '/');
+    setIsAdminView(false);
+  };
+
+  return (
+    <AuthProvider>
+      {isAdminView ? (
+        <AdminPortal onGoHome={handleGoHome} />
+      ) : (
+        <MainPortfolio
+          galleryImages={galleryImages}
+          siteConfig={siteConfig}
+        />
+      )}
+    </AuthProvider>
   );
 }

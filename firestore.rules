@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function for authentication check
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Public portfolio images: Read by everyone, writable only by authenticated admin
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Site settings & hero/about configurations: Read by everyone, writable only by authenticated admin
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+  }
+}

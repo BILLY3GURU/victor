@@ -10,4 +10,14 @@ export interface GalleryImage {
   url: string;
   category: string;
   title: string;
+  order?: number;
+  createdAt?: string;
+}
+
+export interface SiteConfig {
+  heroImage: string;
+  heroTagline?: string;
+  aboutImage: string;
+  aboutTitle?: string;
+  aboutBio?: string;
 }
